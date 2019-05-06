@@ -19,6 +19,26 @@ public class Huffman {
         newBytes[bytes.length] = 0;
         return newBytes;
     }
+    static void printCodeMapInverse(HashMap<List<Byte>, Byte> map) {
+        System.out.println("CodeMap:");
+        for (Map.Entry<List<Byte>, Byte> entry : map.entrySet()) {
+            Byte b = entry.getValue();
+            String output = "";
+            output += codeToString(entry.getKey());
+            output += " -> ";
+            output += String.format("[%02X]", b);
+            output += "[";
+            if (b == 10) {
+                output += "Line Feed";
+            } else if (b == 13) {
+                output += "Carriage Return";
+            } else {
+                output += ((char) (b & 0xFF)) ;
+            }
+            output += "]";
+            System.out.println(output);
+        }
+    }
     static void printCodeMap(HashMap<Byte, List<Byte>> map) {
         System.out.println("CodeMap:");
         for (Map.Entry<Byte, List<Byte>> entry : map.entrySet()) {
@@ -30,7 +50,7 @@ public class Huffman {
             } else if (b == 13) {
                 output += "Carriage Return";
             } else {
-                output += ((char) (entry.getKey() & 0xFF)) ;
+                output += ((char) (b & 0xFF)) ;
             }
             output += "]";
             output += " -> ";
@@ -243,14 +263,24 @@ public class Huffman {
         for (Map.Entry<Byte, List<Byte>> entry : map.entrySet()) {
             //System.out.println(entry.getKey() + " -> "
                 //+ codeToString(entry.getValue()));
-            tableList.add(entry.getKey());
-            tableList.add((byte)entry.getValue().size());
-            List<Byte> codeByteList = codeToByteList(entry.getValue());
-            for (Byte b : codeByteList) {
-                tableList.add(b);
+            if (entry.getKey() != 0) {
+                tableList.add(entry.getKey());
+                tableList.add((byte)entry.getValue().size());
+                List<Byte> codeByteList = codeToByteList(entry.getValue());
+                for (Byte b : codeByteList) {
+                    tableList.add(b);
+                } 
             }
+            
         }
-        tableList.add((byte)0);
+        byte key = (byte) 0;
+        tableList.add(key);
+        List<Byte> code = map.get(key);
+        tableList.add((byte)code.size());
+        List<Byte> codeByteList = codeToByteList(code);
+        for (Byte b : codeByteList) {
+            tableList.add(b);
+        }
         return tableList;
     }
     public static byte[] combineArrays(byte[] a, byte[] b) {
@@ -305,7 +335,72 @@ public class Huffman {
         printByteArray("FileArray", fileArray);
         byteArrayToFile(fileArray, fileName);
     }
+    public static HashMap<List<Byte>, Byte> getTable(byte[] bytes) {
+        HashMap<List<Byte>, Byte> table = new HashMap<>();
+        int i = 0;
+        while (i < bytes.length) {
+            Byte b = bytes[i];
+            i++;
+            int codeLength = bytes[i] & 0xff;
+            i++;
+            {
+                List<Byte> code = new LinkedList<>();
+                int scanner = 1 << 7;
+                int bitCount = 0;
+                int bitOverflow = 1;
+                while (bitCount < codeLength) {
+                    Byte bit = (byte) (bytes[i] & scanner);
+                    if(bit == 0) {
+                        bit = 0;
+                    } else {
+                        bit = 1;
+                    }
+                    code.add(bit);
+                    bitCount++;
+                    bitOverflow++;
+                    if (bitOverflow >= 8) {
+                        bitOverflow = 1;
+                        i++;
+                        scanner = 1 << 7;
+                    } else {
+                        scanner = scanner >> 1;
+                    }
+                }
+                table.put(code, b);
+            }
+        }
+        return table;
+    }
+    public static TableAndDataList getTableAndDataList(byte[] fileBytes) {
+        TableAndDataList tad = new TableAndDataList();
+        boolean addToTable = true;
+        boolean nullFound = false;
+        for (Byte b : fileBytes) {
+            if (addToTable) {
+                if (!nullFound) {
+                    if (b == 0) {
+                        nullFound = true;
+                    }
+                    tad.table.add(b);
+                } else {
+                    if (b == 0) {
+                        addToTable = false;
+                    } else {
+                        tad.table.add(b);
+                    }
+                }
+            } else {
+                tad.data.add(b);
+            }
+            
+        }
+        return tad;
+    }
     public static void decompress(String fileName) {
-
+        byte[] fileBytes = readBytes(fileName);
+        TableAndDataList tad = getTableAndDataList(fileBytes);
+        byte[] tableArray = getByteArray(tad.table);
+        HashMap<List<Byte>, Byte> table = getTable(tableArray);
+        printCodeMapInverse(table);
     }
 }
