@@ -256,10 +256,9 @@ public class Huffman {
             System.exit(1);
         }
     }
-    public static void comprimir(String[] args) {
+    public static void compress(String fileName) {
         //System.out.println("Working Directory = " + System.getProperty("user.dir"));
         //System.out.println("Huffman");
-        String fileName = "archivo.txt";
         byte[] fileBytes = readBytes(fileName);
         fileBytes = addNullByte(fileBytes);
         //printFileBytes(fileBytes);
@@ -284,5 +283,8 @@ public class Huffman {
         byte[] fileArray = combineArrays(dataArray, tableArray);
         printByteArray("FileArray", fileArray);
         byteArrayToFile(fileArray, fileName);
+    }
+    public static void decompress(String fileName) {
+
     }
 }

@@ -6,7 +6,34 @@ package mar;
 import mar.huffman.Huffman;
 
 public class Main {
+
+    static void printTokens(String[] tokens) {
+        System.out.println("Tokens:");
+        for (String token : tokens) {
+            System.out.println("token: " + token);
+        }
+    }
     public static void main(String[] args) {
-        Huffman.comprimir(args);
+        System.out.println("Args: " + args);
+        for (String argument : args) {
+            System.out.println("Argument: " + argument);
+        }
+        if (args.length < 1) {
+            System.out.println("Uso: huffman <nombre_del_archivo.txt(.sip)>");
+            System.exit(1);
+        }
+        String fileName = args[0];
+        String[] tokens = fileName.split("\\.");
+        printTokens(tokens);
+        String extension = tokens[tokens.length - 1];
+        System.out.println("Extension: " + extension);
+        if (extension.equals("sip")) {
+            System.out.println("Descomprimir");
+            Huffman.decompress(fileName);
+        } else {
+            System.out.println("Comprimir");
+            Huffman.compress(fileName);
+        }
+        
     }
 }
