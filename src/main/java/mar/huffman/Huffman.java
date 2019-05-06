@@ -22,11 +22,20 @@ public class Huffman {
     static void printCodeMap(HashMap<Byte, List<Byte>> map) {
         System.out.println("CodeMap:");
         for (Map.Entry<Byte, List<Byte>> entry : map.entrySet()) {
-            System.out.println(entry.getKey()
-                + String.format("[%02X]", entry.getKey())
-                + "[" + ((char) (entry.getKey() & 0xFF)) + "]"
-                + " -> "
-                + codeToString(entry.getValue()));
+            Byte b = entry.getKey();
+            String output = String.format("[%02X]", b);
+            output += "[";
+            if (b == 10) {
+                output += "Line Feed";
+            } else if (b == 13) {
+                output += "Carriage Return";
+            } else {
+                output += ((char) (entry.getKey() & 0xFF)) ;
+            }
+            output += "]";
+            output += " -> ";
+            output += codeToString(entry.getValue());
+            System.out.println(output);
         }
     }
     static void printFrecMap(HashMap<Byte, Integer> map) {
