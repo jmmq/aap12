@@ -23,9 +23,9 @@ public class Huffman {
         System.out.println("CodeMap:");
         for (Map.Entry<Byte, List<Byte>> entry : map.entrySet()) {
             System.out.println(entry.getKey()
-                    + String.format("[%02X]", entry.getKey())
-                    + " -> "
-                    + codeToString(entry.getValue()));
+                + String.format("[%02X]", entry.getKey())
+                + " -> "
+                + codeToString(entry.getValue()));
         }
     }
     static void printFrecMap(HashMap<Byte, Integer> map) {
