@@ -24,6 +24,7 @@ public class Huffman {
         for (Map.Entry<Byte, List<Byte>> entry : map.entrySet()) {
             System.out.println(entry.getKey()
                 + String.format("[%02X]", entry.getKey())
+                + "[" + ((char) (entry.getKey() & 0xFF)) + "]"
                 + " -> "
                 + codeToString(entry.getValue()));
         }
@@ -199,6 +200,15 @@ public class Huffman {
         }
         System.out.println();
     }
+    static void printByteArrayasBinary(String name, byte[] array) {
+        System.out.println(name + " as binary:");
+        for (byte b : array) {
+            System.out.print("[" 
+                + String.format("%8s", Integer.toBinaryString(b & 0xFF)).replace(' ', '0') 
+                + "]");
+        }
+        System.out.println();
+    }
     static void printByteArray(String name, byte[] array) {
         System.out.println(name + ":");
         for (byte b : array) {
@@ -276,11 +286,13 @@ public class Huffman {
         List<Byte> dataByteList = getByteList(dataBitList);
         //printByteList(byteList);
         byte[] dataArray = getByteArray(dataByteList);
-        printByteArray("ByteArray", dataArray);
+        printByteArray("DataArray", dataArray);
+        printByteArrayasBinary("DataArray", dataArray);
         List<Byte> tableList = getTableList(codeMap);
         byte[] tableArray = getByteArray(tableList);
         printByteArray("TableArray", tableArray);
-        byte[] fileArray = combineArrays(dataArray, tableArray);
+        printByteArrayasBinary("TableArray", tableArray);
+        byte[] fileArray = combineArrays(tableArray, dataArray);
         printByteArray("FileArray", fileArray);
         byteArrayToFile(fileArray, fileName);
     }
