@@ -29,7 +29,7 @@ public class Main {
         System.out.println("Extension: " + extension);
         if (extension.equals("sip")) {
             System.out.println("Descomprimir");
-            Huffman.decompress(fileName, "output");
+            Huffman.decompress(fileName, "output." + tokens[tokens.length - 2]);
         } else {
             System.out.println("Comprimir");
             Huffman.compress(fileName);
