@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
+import java.io.*;
 
 public class Huffman {
     static byte[] addNullByte(byte[] bytes) {
@@ -396,11 +397,47 @@ public class Huffman {
         }
         return tad;
     }
-    public static void decompress(String fileName) {
-        byte[] fileBytes = readBytes(fileName);
-        TableAndDataList tad = getTableAndDataList(fileBytes);
-        byte[] tableArray = getByteArray(tad.table);
-        HashMap<List<Byte>, Byte> table = getTable(tableArray);
-        printCodeMapInverse(table);
+    public static void decompress(String fileName, String outputfile) throws Exception {
+
+		BitStream bs = new BitStream(fileName);
+		PrintWriter output = new PrintWriter(outputfile, "UTF-8");
+		int i = 0;
+		int ascii, length; 
+		HashMap<String, Byte> codes = new HashMap<String, Byte>();
+		do
+		{
+			String code = "";
+			ascii = bs.nextByte();
+			length = bs.nextByte();
+			for(i = 0; i < length; i++)
+			{
+				if(bs.nextBit() != 0)
+					code = code + "1";
+				else
+					code = code + "0";
+			}
+			bs.skip();
+			char asciiChar = (char) ascii;
+			System.out.println(asciiChar + " -> " + code + " length = " + length);
+			codes.put(code, (byte) ascii);
+		} while(ascii != 0);
+
+		while(true)
+		{
+			String nextCode = "";
+			while(!codes.containsKey(nextCode))
+			{
+				if(bs.nextBit() != 0)
+					nextCode = nextCode + "1";
+				else
+					nextCode = nextCode + "0";
+			}
+			char charToPrint = (char)((byte)codes.get(nextCode));
+			if(charToPrint == 0)
+				break;
+			output.print(charToPrint);
+		}
+		output.close();
+
     }
 }

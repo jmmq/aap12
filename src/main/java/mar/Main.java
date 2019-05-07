@@ -3,7 +3,7 @@
  */
 package mar;
 
-import mar.huffman.Huffman;
+import mar.huffman.*;
 
 public class Main {
 
@@ -13,7 +13,7 @@ public class Main {
             System.out.println("token: " + token);
         }
     }
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         System.out.println("Args: " + args);
         for (String argument : args) {
             System.out.println("Argument: " + argument);
@@ -29,11 +29,10 @@ public class Main {
         System.out.println("Extension: " + extension);
         if (extension.equals("sip")) {
             System.out.println("Descomprimir");
-            Huffman.decompress(fileName);
+            Huffman.decompress(fileName, "output");
         } else {
             System.out.println("Comprimir");
             Huffman.compress(fileName);
         }
-        
     }
 }
